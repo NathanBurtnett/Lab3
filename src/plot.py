@@ -6,6 +6,7 @@ and plots the results.
 import serial
 import matplotlib.pyplot as plt
 import time
+import utime
 
 
 def wait_for_tok(ser, tok):
@@ -22,6 +23,11 @@ def wait_for_tok(ser, tok):
         r = ser.readline().decode("ascii")
         print(f"SER: {r}", end="")
 
+def write_ctrl_c(s):
+    s.write(b'\x03')
+
+def write_ctrl_d(s):
+    s.write(b'\x04')
 
 def init_board(ser):
     """!
@@ -30,12 +36,16 @@ def init_board(ser):
     """
     print("initializing board...")
 
-    s.write(b'\x03')
-    time.sleep(1)
+    # Make sure program is dead...
+    for _ in range(5):
+        write_ctrl_c(s)
+
+    time.sleep(.5)
 
     s.reset_input_buffer()
 
-    s.write(b'\x04')
+    # Reset board
+    write_ctrl_d(s)
 
 
 def proc_lines(csv_lines):
@@ -49,8 +59,23 @@ def proc_lines(csv_lines):
 
     return x, y
 
+def write(ser, val):
+    ser.write(bytes(f"{val}\r\n", 'ascii'))
 
-def run_step_response(s, kP, setpoint, num_pts=250):
+def write_to_tok(s, tok, v):
+    wait_for_tok(s, tok)
+    write(s, v)
+
+def read_csv(end_tok):
+    r = ""
+    csv = []
+    while True:
+        r = s.readline().decode("ascii").strip()
+        if r.startswith(end_tok):
+            break
+        csv.append(r)
+    return csv
+def run_step_response(s, kPs, setpoints, period):
     """!
     Runs the step response of the motor.
     :param s: The serial value of the connecting wire
@@ -60,28 +85,32 @@ def run_step_response(s, kP, setpoint, num_pts=250):
     :return: The csv file to be plotted
     """
     # Kp token
-    wait_for_tok(s, "$A")
-    s.write(bytes(f"{kP}\r\n", 'ascii'))
+    m0, m1 = kPs
+    write_to_tok(s, "$a", m0)
+    write_to_tok(s, "$b", m1)
 
     # setpoint token
-    wait_for_tok(s, "$B")
-    s.write(bytes(f"{setpoint}\r\n", 'ascii'))
+    m0, m1 = setpoints
+    write_to_tok(s, "$c", m0)
+    write_to_tok(s, "$d", m1)
 
-    wait_for_tok(s, "$E")
-    s.write(bytes(f"{num_pts}\r\n", 'ascii'))
+    # Period
+    write_to_tok(s, "$e", period)
 
-    wait_for_tok(s, "$C")
+    # TODO: Fix this?
+    time.sleep(5)
+
+    # Exit response loop
+    write_ctrl_c(s)
     print("Getting CSV")
 
-    r = ""
-    csv = []
-    while True:
-        r = s.readline().decode("ascii").strip()
-        if r.startswith("$D"):
-            break
-        csv.append(r)
+    wait_for_tok(s, "$f")
+    m0_csv = read_csv("$g")
 
-    return csv
+    wait_for_tok(s, "$h")
+    m1_csv = read_csv("$i")
+
+    return m0_csv, m1_csv
 
 
 # Sets the serial channel and baud rate of the connection

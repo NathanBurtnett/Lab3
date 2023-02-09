@@ -150,6 +150,13 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
             break
 
+        # Print data
+        print("$f M0 data")
+        print("$g End Data")
+
+        print("$h M1 data")
+        print("$i End Data")
+
     # Print a table of task data and a table of shared information data
     print('\n' + str(cotask.task_list))
     print(task_share.show_all())
