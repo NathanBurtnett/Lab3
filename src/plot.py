@@ -147,7 +147,7 @@ def plot_position_tests(s, m0_poss, m1_poss, per):
     plt.xlabel("Time (ms)")
     plt.ylabel("Position (enc count)")
     plt.title("Step Response")
-    plt.savefig("periods.png")
+    plt.savefig("positions.png")
     plt.show()
 
 # Sets the serial channel and baud rate of the connection
