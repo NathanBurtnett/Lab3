@@ -55,6 +55,8 @@ def task2_fun(shares):
 
         yield 0
 
+def task3_motor1(shares):
+
 
 # This code creates a share, a queue, and two tasks, then starts the tasks. The
 # tasks run until somebody presses ENTER, at which time the scheduler stops and
