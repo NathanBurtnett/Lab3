@@ -36,16 +36,17 @@ def init_board(ser):
     print("initializing board...")
 
     # Make sure program is dead...
-    for _ in range(2):
+    write_ctrl_d(s)
+
+    for _ in range(3):
         write_ctrl_c(s)
 
-    time.sleep(1)
+    time.sleep(.5)
 
     s.reset_input_buffer()
 
     # Reset board
     write_ctrl_d(s)
-
 
 def process_response(period, ):
     """!
@@ -85,7 +86,8 @@ def run_step_response(s, kPs, setpoints, period, t_tot=5):
     :param num_pts: The maximum number of points wanted for the plot
     :return: The csv file to be plotted
     """
-    # Kp token
+    # Kp tokenz
+    print("Doing step response")
     m0, m1 = kPs
     write_to_tok(s, "$a", m0)
     write_to_tok(s, "$b", m1)
