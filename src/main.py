@@ -14,12 +14,22 @@ import gc
 import pyb
 import cotask
 import task_share
-import encoder_reader
-import control
-import motor_driver
+from src.encoder_reader import EncoderReader
+from src.control import Control
 import boot
+from src.motor_driver import MotorDriver
 
+def get_numeric_input(prompt):
+    while True:
+        try:
+            i = input(prompt)
+            return float(i)
 
+        except ValueError:
+            print("Invalid number")
+
+        except EOFError:
+            sys.exit(0)
 
 def task1_fun(shares):
     """!
@@ -57,7 +67,6 @@ def task2_fun(shares):
 
 def task3_motor1(shares):
     """!
-
     :param shares:
     :return:
     """
@@ -66,18 +75,18 @@ def task3_motor1(shares):
         setpoint = get_numeric_input("Enter a setpoint\n")
 
 
-        enc.zero()
+        enc1.zero()
         print("Performing step response")
-        while len(con.positions) < 500:
-            measured_output = -enc.read()
-            motor_actuation = con.run(setpoint, measured_output)
+        while len(con1.positions) < 500:
+            measured_output = -enc1.read()
+            motor_actuation = con1.run(setpoint, measured_output)
             m1.set_duty_cycle(motor_actuation)
             pyb.delay(10)
 
         m1.set_duty_cycle(0)
         print("Done!")
 
-        con.print_time()
+        con1.print_time()
 
 
 # This code creates a share, a queue, and two tasks, then starts the tasks. The
