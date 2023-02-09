@@ -137,22 +137,22 @@ if __name__ == "__main__":
 
     # Run the scheduler with the chosen scheduling algorithm. Quit if ^C pressed
     while True:
-        m0Kp.put(get_fnumeric_input("$a m0 kp"))
-        m1Kp.put(get_fnumeric_input("$b m1 kp"))
+        m0Kp.put(get_fnumeric_input("$a Set Motor 0 kp: "))
+        m1Kp.put(get_fnumeric_input("$b Set Motor 1 kp: "))
 
-        m0setpoint.put(get_inumeric_input("$c m0 setpoint"))
-        m1setpoint.put(get_inumeric_input("$d m1 setpoint"))
+        m0setpoint.put(get_inumeric_input("$c Set Motor 0 setpoint: "))
+        m1setpoint.put(get_inumeric_input("$d Set Motor 1 setpoint: "))
 
 
-        per = get_inumeric_input("$e task period")
+        per = get_inumeric_input("$e Enter Task Period: ")
 
         m0Task.set_period(per)
         m1Task.set_period(per)
-
-        try:
-            cotask.task_list.pri_sched()
-        except KeyboardInterrupt:
-            break
+        while True:
+            try:
+                cotask.task_list.pri_sched()
+            except KeyboardInterrupt:
+                break
 
         # Print data
         print("$f M0 data")
