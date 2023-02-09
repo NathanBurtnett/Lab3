@@ -56,19 +56,14 @@ def task1_fun(shares):
     enc0 = EncoderReader(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
 
     while True:
-        con = Control(kp.get(), setpoint.get(), initial_output=0)
-        enc0.zero()
-        print("Performing step response")
-        while len(con.positions) < 500:
-            measured_output = -enc0.read()
-            motor_actuation = con.run(setpoint.get(), measured_output)
-            m0.set_duty_cycle(motor_actuation)
-            data.put(measured_output)
-            yield 0
+        con.set_setpoint(setpoint.get())
+        con.set_Kp(kp.get())
 
-        m0.set_duty_cycle(0)
-        print("Done!")
-        con.print_time()
+        measured_output = -enc1.read()
+        motor_actuation = con.run(setpoint.get(), measured_output)
+        m1.set_duty_cycle(motor_actuation)
+
+        data.put(measured_output)
         yield 0
 
 
@@ -83,21 +78,17 @@ def task2_fun(shares):
     # Create the motor and motor encoder objects
     m1 = MotorDriver(pyb.Pin.board.PC1, pyb.Pin.board.PA0, pyb.Pin.board.PA1, 5)
     enc1 = EncoderReader(pyb.Pin.board.PC2, pyb.Pin.board.PC3, 4)
+    con = Control(kp.get(), setpoint.get(), initial_output=0)
 
     while True:
-        con = Control(kp.get(), setpoint.get(), initial_output=0)
-        enc1.zero()
-        print("Performing step response")
-        while len(con.positions) < 500:
-            measured_output = -enc1.read()
-            motor_actuation = con.run(setpoint.get(), measured_output)
-            m1.set_duty_cycle(motor_actuation)
-            data.put(measured_output)
-            yield 0
+        con.set_setpoint(setpoint.get())
+        con.set_Kp(kp.get())
 
-        m1.set_duty_cycle(0)
-        print("Done!")
-        con.print_time()
+        measured_output = -enc1.read()
+        motor_actuation = con.run(setpoint.get(), measured_output)
+        m1.set_duty_cycle(motor_actuation)
+
+        data.put(measured_output)
         yield 0
 
 # This code creates a share, a queue, and two tasks, then starts the tasks. The
@@ -114,9 +105,9 @@ if __name__ == "__main__":
     m0setpoint = task_share.Share('l', thread_protect=False, name="m0 setpoint")
     m1setpoint = task_share.Share('l', thread_protect=False, name="m1 setpoint")
 
-    m0Data = task_share.Queue('L', 1000, thread_protect=False, overwrite=False,
+    m0Data = task_share.Queue('L', 1000, thread_protect=False, overwrite=True,
                           name="M0 data")
-    m1Data = task_share.Queue('L', 1000, thread_protect=False, overwrite=False,
+    m1Data = task_share.Queue('L', 1000, thread_protect=False, overwrite=True,
                           name="M1 data")
     # Create the tasks. If trace is enabled for any task, memory will be
     # allocated for state transition tracing, and the application will run out
@@ -156,6 +147,7 @@ if __name__ == "__main__":
 
         # Print data
         print("$f M0 data")
+
         print("$g End Data")
 
         print("$h M1 data")

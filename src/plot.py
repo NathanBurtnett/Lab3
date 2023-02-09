@@ -115,6 +115,7 @@ def run_step_response(s, kPs, setpoints, period):
     return m0_csv, m1_csv
 
 def run_period_tests(periods):
+    pass    
 
 # Sets the serial channel and baud rate of the connection
 with serial.Serial('COM3', baudrate=115200) as s:
