@@ -72,7 +72,7 @@ def task1_fun(shares):
     :param shares:
     :return:
     """
-    kp, setpoint = shares
+    kp, setpoint, data = shares
 
     # Create the motor and motor encoder objects
     m1 = MotorDriver(pyb.Pin.board.PA10, pyb.Pin.board.PB4, pyb.Pin.board.PB5, 3)
@@ -107,15 +107,19 @@ if __name__ == "__main__":
     m0setpoint = task_share.Share('l', thread_protect=False, name="m0 setpoint")
     m1setpoint = task_share.Share('l', thread_protect=False, name="m1 setpoint")
 
+    m0Data = task_share.Queue('L', 1000, thread_protect=False, overwrite=False,
+                          name="M0 data")
+    m1Data = task_share.Queue('L', 1000, thread_protect=False, overwrite=False,
+                          name="M1 data")
     # Create the tasks. If trace is enabled for any task, memory will be
     # allocated for state transition tracing, and the application will run out
     # of memory after a while and quit. Therefore, use tracing only for 
     # debugging and set trace to False when it's not needed
     m0Task = cotask.Task(task1_fun, name="Motor 0 Driver", priority=1, period=10,
-                        profile=True, trace=False, shares=(m0Kp, m0setpoint))
+                        profile=True, trace=False, shares=(m0Kp, m0setpoint, m0Data))
 
     m1Task = cotask.Task(task1_fun, name="Motor 1 Driver", priority=1, period=10,
-                        profile=True, trace=False, shares=(m1Kp, m1setpoint))
+                        profile=True, trace=False, shares=(m1Kp, m1setpoint, m1Data))
 
     cotask.task_list.append(m0Task)
     cotask.task_list.append(m1Task)
