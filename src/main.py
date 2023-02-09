@@ -33,62 +33,60 @@ def get_numeric_input(prompt):
             sys.exit(0)
 
 
+# def task1_fun(shares):
+#     """!
+#     Task which puts things into a share and a queue.
+#     @param shares A list holding the share and queue used by this task
+#     """
+#     # Get references to the share and queue which have been passed to this task
+#     my_share, my_queue = shares
+#
+#     counter = 0
+#     while True:
+#         my_share.put(counter)
+#         my_queue.put(counter)
+#         counter += 1
+#
+#         yield 0
+#
+#
+# def task2_fun(shares):
+#     """!
+#     Task which takes things out of a queue and share and displays them.
+#     @param shares A tuple of a share and queue from which this task gets data
+#     """
+#     # Get references to the share and queue which have been passed to this task
+#     the_share, the_queue = shares
+#
+#     while True:
+#         # Show everything currently in the queue and the value in the share
+#         print(f"Share: {the_share.get()}, Queue: ", end='')
+#         while q0.any():
+#             print(f"{the_queue.get()} ", end='')
+#         print('')
+#
+#         yield 0
+
 def task1_fun(shares):
-    """!
-    Task which puts things into a share and a queue.
-    @param shares A list holding the share and queue used by this task
-    """
-    # Get references to the share and queue which have been passed to this task
-    my_share, my_queue = shares
-
-    counter = 0
-    while True:
-        my_share.put(counter)
-        my_queue.put(counter)
-        counter += 1
-
-        yield 0
-
-
-def task2_fun(shares):
-    """!
-    Task which takes things out of a queue and share and displays them.
-    @param shares A tuple of a share and queue from which this task gets data
-    """
-    # Get references to the share and queue which have been passed to this task
-    the_share, the_queue = shares
-
-    while True:
-        # Show everything currently in the queue and the value in the share
-        print(f"Share: {the_share.get()}, Queue: ", end='')
-        while q0.any():
-            print(f"{the_queue.get()} ", end='')
-        print('')
-
-        yield 0
-
-
-def task3_fun(shares):
     """!
     :param shares:
     :return:
     """
+    the_share, the_queue = shares
     while True:
-        Kp = get_numeric_input("Enter a value for Kp\n")
-        setpoint = get_numeric_input("Enter a setpoint\n")
-
+        con = Control(Kp, setpoint, initial_output=0)
         enc1.zero()
         print("Performing step response")
-        while len(con1.positions) < 500:
+        while len(con.positions) < 500:
             measured_output = -enc1.read()
-            motor_actuation = con1.run(setpoint, measured_output)
+            motor_actuation = con.run(setpoint, measured_output)
             m1.set_duty_cycle(motor_actuation)
             pyb.delay(10)
 
         m1.set_duty_cycle(0)
         print("Done!")
 
-        con1.print_time()
+        con.print_time()
 
 
 # This code creates a share, a queue, and two tasks, then starts the tasks. The
@@ -107,23 +105,17 @@ if __name__ == "__main__":
     # allocated for state transition tracing, and the application will run out
     # of memory after a while and quit. Therefore, use tracing only for 
     # debugging and set trace to False when it's not needed
-    task1 = cotask.Task(task1_fun, name="Task_1", priority=1, period=400,
+    task1 = cotask.Task(task1_fun, name="Motor 1 Driver", priority=1, period=10,
                         profile=True, trace=False, shares=(share0, q0))
-    task2 = cotask.Task(task2_fun, name="Task_2", priority=2, period=1500,
-                        profile=True, trace=False, shares=(share0, q0))
-    #task3 = cotask.Task(task3_fun, name="Motor 1 Driver", priority=3, period=1500,
-    #                   profile=True, trace=False, shares=(share0, q0))
     cotask.task_list.append(task1)
-    cotask.task_list.append(task2)
-    # cotask.task_list.append(task3)
+
 
     # Create the motor and motor encoder objects
-    # m1 = MotorDriver(pyb.Pin.board.PA10, pyb.Pin.board.PB4, pyb.Pin.board.PB5, 3)
-    # enc1 = EncoderReader(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
-    # con1 = Control(Kp, setpoint=setpoint, initial_output=0)
+    m1 = MotorDriver(pyb.Pin.board.PA10, pyb.Pin.board.PB4, pyb.Pin.board.PB5, 3)
+    enc1 = EncoderReader(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
+
     # m2 = MotorDriver(pyb.Pin.board.PC1, pyb.Pin.board.PA0, pyb.Pin.board.PA1, 5)
     # enc2 = EncoderReader(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
-    # con2 = Control(Kp, setpoint=setpoint, initial_output=0)
 
     # Run the memory garbage collector to ensure memory is as defragmented as
     # possible before the real-time scheduler is started
