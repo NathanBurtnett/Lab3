@@ -153,5 +153,6 @@ if __name__ == "__main__":
     # Print a table of task data and a table of shared information data
     print('\n' + str(cotask.task_list))
     print(task_share.show_all())
-    print(task1.get_trace())
+    print(m0Task.get_trace())
+    print(m1Task.get_trace())
     print('')
