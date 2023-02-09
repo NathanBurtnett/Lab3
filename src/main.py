@@ -85,7 +85,7 @@ def task2_fun(shares):
         con.set_setpoint(setpoint.get())
         con.set_Kp(kp.get())
 
-        measured_output = enc1.read()
+        measured_output = -enc1.read()
         motor_actuation = con.run(setpoint.get(), measured_output)
         m1.set_duty_cycle(motor_actuation)
 

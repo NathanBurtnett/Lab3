@@ -6,7 +6,6 @@ and plots the results.
 import serial
 import matplotlib.pyplot as plt
 import time
-import utime
 
 
 def wait_for_tok(ser, tok):
@@ -37,10 +36,10 @@ def init_board(ser):
     print("initializing board...")
 
     # Make sure program is dead...
-    for _ in range(5):
+    for _ in range(2):
         write_ctrl_c(s)
 
-    time.sleep(.5)
+    time.sleep(1)
 
     s.reset_input_buffer()
 
@@ -151,7 +150,7 @@ def plot_position_tests(s, m0_poss, m1_poss, per):
     plt.show()
 
 # Sets the serial channel and baud rate of the connection
-with serial.Serial('COM3', baudrate=115200) as s:
+with serial.Serial('COM5', baudrate=115200) as s:
     init_board(s)
 
     plot_period_tests(s, [10, 20, 50, 100])

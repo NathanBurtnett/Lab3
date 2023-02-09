@@ -53,4 +53,3 @@ class MotorDriver:
         else:
             self.ch_1.pulse_width_percent(0)
             self.ch_2.pulse_width_percent(0)
-            self.ch_2.pulse_width_percent(0)
