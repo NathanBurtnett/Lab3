@@ -46,12 +46,12 @@ def task1_fun(shares):
     enc0 = EncoderReader(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
 
     while True:
-        con = Control(kp, setpoint, initial_output=0)
+        con = Control(kp.get(), setpoint.get(), initial_output=0)
         enc0.zero()
         print("Performing step response")
         while len(con.positions) < 500:
             measured_output = -enc0.read()
-            motor_actuation = con.run(setpoint, measured_output)
+            motor_actuation = con.run(setpoint.get(), measured_output)
             m0.set_duty_cycle(motor_actuation)
             data.put(measured_output)
 
@@ -72,12 +72,12 @@ def task2_fun(shares):
     enc1 = EncoderReader(pyb.Pin.board.PC2, pyb.Pin.board.PC3, 4)
 
     while True:
-        con = Control(kp, setpoint, initial_output=0)
+        con = Control(kp.get(), setpoint.get(), initial_output=0)
         enc1.zero()
         print("Performing step response")
         while len(con.positions) < 500:
             measured_output = -enc1.read()
-            motor_actuation = con.run(setpoint, measured_output)
+            motor_actuation = con.run(setpoint.get(), measured_output)
             m1.set_duty_cycle(motor_actuation)
             data.put(measured_output)
 
