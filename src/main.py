@@ -72,7 +72,12 @@ def task1_fun(shares):
     :param shares:
     :return:
     """
-    the_share, the_queue = shares
+    kp, setpoint = shares
+
+    # Create the motor and motor encoder objects
+    m1 = MotorDriver(pyb.Pin.board.PA10, pyb.Pin.board.PB4, pyb.Pin.board.PB5, 3)
+    enc1 = EncoderReader(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
+
     while True:
         con = Control(Kp, setpoint, initial_output=0)
         enc1.zero()
@@ -81,7 +86,6 @@ def task1_fun(shares):
             measured_output = -enc1.read()
             motor_actuation = con.run(setpoint, measured_output)
             m1.set_duty_cycle(motor_actuation)
-            pyb.delay(10)
 
         m1.set_duty_cycle(0)
         print("Done!")
@@ -97,22 +101,25 @@ if __name__ == "__main__":
           "Press Ctrl-C to stop and show diagnostics.")
 
     # Create a share and a queue to test function and diagnostic printouts
-    share0 = task_share.Share('h', thread_protect=False, name="Share 0")
-    q0 = task_share.Queue('L', 16, thread_protect=False, overwrite=False,
-                          name="Queue 0")
+    m0Kp = task_share.Share('f', thread_protect=False, name="m0 kp")
+    m1Kp = task_share.Share('f', thread_protect=False, name="m1 kp")
+
+    m0setpoint = task_share.Share('l', thread_protect=False, name="m0 setpoint")
+    m1setpoint = task_share.Share('l', thread_protect=False, name="m1 setpoint")
 
     # Create the tasks. If trace is enabled for any task, memory will be
     # allocated for state transition tracing, and the application will run out
     # of memory after a while and quit. Therefore, use tracing only for 
     # debugging and set trace to False when it's not needed
-    task1 = cotask.Task(task1_fun, name="Motor 1 Driver", priority=1, period=10,
-                        profile=True, trace=False, shares=(share0, q0))
-    cotask.task_list.append(task1)
+    m0Task = cotask.Task(task1_fun, name="Motor 0 Driver", priority=1, period=10,
+                        profile=True, trace=False, shares=(m0Kp, m0setpoint))
 
+    m1Task = cotask.Task(task1_fun, name="Motor 1 Driver", priority=1, period=10,
+                        profile=True, trace=False, shares=(m1Kp, m1setpoint))
 
-    # Create the motor and motor encoder objects
-    m1 = MotorDriver(pyb.Pin.board.PA10, pyb.Pin.board.PB4, pyb.Pin.board.PB5, 3)
-    enc1 = EncoderReader(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
+    cotask.task_list.append(m0Task)
+    cotask.task_list.append(m1Task)
+
 
     # m2 = MotorDriver(pyb.Pin.board.PC1, pyb.Pin.board.PA0, pyb.Pin.board.PA1, 5)
     # enc2 = EncoderReader(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
@@ -123,6 +130,17 @@ if __name__ == "__main__":
 
     # Run the scheduler with the chosen scheduling algorithm. Quit if ^C pressed
     while True:
+        m0Kp.put(get_numeric_input("$a m0 kp"))
+        m1Kp.put(get_numeric_input("$b m1 kp"))
+
+        m0setpoint.put(get_numeric_input("$c m0 setpoint"))
+        m1setpoint.put(get_numeric_input("$d m1 setpoint"))
+
+        per = get_numeric_input("$e task period")
+
+        m0Task.set_period(per)
+        m1Task.set_period(per)
+
         try:
             cotask.task_list.pri_sched()
         except KeyboardInterrupt:
