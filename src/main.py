@@ -54,10 +54,13 @@ def task1_fun(shares):
             motor_actuation = con.run(setpoint.get(), measured_output)
             m0.set_duty_cycle(motor_actuation)
             data.put(measured_output)
+            yield 0
 
         m0.set_duty_cycle(0)
         print("Done!")
         con.print_time()
+        yield 0
+
 
 
 def task2_fun(shares):
@@ -80,11 +83,12 @@ def task2_fun(shares):
             motor_actuation = con.run(setpoint.get(), measured_output)
             m1.set_duty_cycle(motor_actuation)
             data.put(measured_output)
+            yield 0
 
         m1.set_duty_cycle(0)
         print("Done!")
         con.print_time()
-
+        yield 0
 
 # This code creates a share, a queue, and two tasks, then starts the tasks. The
 # tasks run until somebody presses ENTER, at which time the scheduler stops and
