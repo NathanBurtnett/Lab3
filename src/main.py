@@ -56,6 +56,28 @@ def task2_fun(shares):
         yield 0
 
 def task3_motor1(shares):
+    """!
+
+    :param shares:
+    :return:
+    """
+    while True:
+        Kp = get_numeric_input("Enter a value for Kp\n")
+        setpoint = get_numeric_input("Enter a setpoint\n")
+
+
+        enc.zero()
+        print("Performing step response")
+        while len(con.positions) < 500:
+            measured_output = -enc.read()
+            motor_actuation = con.run(setpoint, measured_output)
+            m1.set_duty_cycle(motor_actuation)
+            pyb.delay(10)
+
+        m1.set_duty_cycle(0)
+        print("Done!")
+
+        con.print_time()
 
 
 # This code creates a share, a queue, and two tasks, then starts the tasks. The
@@ -80,6 +102,14 @@ if __name__ == "__main__":
                         profile=True, trace=False, shares=(share0, q0))
     cotask.task_list.append(task1)
     cotask.task_list.append(task2)
+
+    # Create the motor and motor encoder objects
+    m1 = MotorDriver(pyb.Pin.board.PA10, pyb.Pin.board.PB4, pyb.Pin.board.PB5, 3)
+    enc1 = EncoderReader(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
+    con1 = Control(Kp, setpoint=setpoint, initial_output=0)
+    m2 = MotorDriver(pyb.Pin.board.PC1, pyb.Pin.board.PA0, pyb.Pin.board.PA1, 5)
+    #enc2 = EncoderReader(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
+    #con2 = Control(Kp, setpoint=setpoint, initial_output=0)
 
     # Run the memory garbage collector to ensure memory is as defragmented as
     # possible before the real-time scheduler is started
