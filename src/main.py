@@ -19,6 +19,7 @@ from src.control import Control
 import boot
 from src.motor_driver import MotorDriver
 
+
 def get_numeric_input(prompt):
     while True:
         try:
@@ -30,6 +31,7 @@ def get_numeric_input(prompt):
 
         except EOFError:
             sys.exit(0)
+
 
 def task1_fun(shares):
     """!
@@ -58,14 +60,15 @@ def task2_fun(shares):
 
     while True:
         # Show everything currently in the queue and the value in the share
-        print(f"Share: {the_share.get ()}, Queue: ", end='')
+        print(f"Share: {the_share.get()}, Queue: ", end='')
         while q0.any():
-            print(f"{the_queue.get ()} ", end='')
+            print(f"{the_queue.get()} ", end='')
         print('')
 
         yield 0
 
-def task3_motor1(shares):
+
+def task3_fun(shares):
     """!
     :param shares:
     :return:
@@ -73,7 +76,6 @@ def task3_motor1(shares):
     while True:
         Kp = get_numeric_input("Enter a value for Kp\n")
         setpoint = get_numeric_input("Enter a setpoint\n")
-
 
         enc1.zero()
         print("Performing step response")
@@ -109,16 +111,19 @@ if __name__ == "__main__":
                         profile=True, trace=False, shares=(share0, q0))
     task2 = cotask.Task(task2_fun, name="Task_2", priority=2, period=1500,
                         profile=True, trace=False, shares=(share0, q0))
+    #task3 = cotask.Task(task3_fun, name="Motor 1 Driver", priority=3, period=1500,
+    #                   profile=True, trace=False, shares=(share0, q0))
     cotask.task_list.append(task1)
     cotask.task_list.append(task2)
+    # cotask.task_list.append(task3)
 
     # Create the motor and motor encoder objects
-    m1 = MotorDriver(pyb.Pin.board.PA10, pyb.Pin.board.PB4, pyb.Pin.board.PB5, 3)
-    enc1 = EncoderReader(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
-    con1 = Control(Kp, setpoint=setpoint, initial_output=0)
-    m2 = MotorDriver(pyb.Pin.board.PC1, pyb.Pin.board.PA0, pyb.Pin.board.PA1, 5)
-    #enc2 = EncoderReader(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
-    #con2 = Control(Kp, setpoint=setpoint, initial_output=0)
+    # m1 = MotorDriver(pyb.Pin.board.PA10, pyb.Pin.board.PB4, pyb.Pin.board.PB5, 3)
+    # enc1 = EncoderReader(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
+    # con1 = Control(Kp, setpoint=setpoint, initial_output=0)
+    # m2 = MotorDriver(pyb.Pin.board.PC1, pyb.Pin.board.PA0, pyb.Pin.board.PA1, 5)
+    # enc2 = EncoderReader(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
+    # con2 = Control(Kp, setpoint=setpoint, initial_output=0)
 
     # Run the memory garbage collector to ensure memory is as defragmented as
     # possible before the real-time scheduler is started
@@ -132,7 +137,7 @@ if __name__ == "__main__":
             break
 
     # Print a table of task data and a table of shared information data
-    print('\n' + str (cotask.task_list))
+    print('\n' + str(cotask.task_list))
     print(task_share.show_all())
     print(task1.get_trace())
     print('')
