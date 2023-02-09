@@ -127,11 +127,11 @@ if __name__ == "__main__":
 
     # Run the scheduler with the chosen scheduling algorithm. Quit if ^C pressed
     while True:
-        m0Kp.put(get_numeric_input("$a m0 kp"))
-        m1Kp.put(get_numeric_input("$b m1 kp"))
+        m0Kp.put(get_numeric_input("$a m0 kp: "))
+        m1Kp.put(get_numeric_input("$b m1 kp: "))
 
-        m0setpoint.put(get_numeric_input("$c m0 setpoint"))
-        m1setpoint.put(get_numeric_input("$d m1 setpoint"))
+        m0setpoint.put(get_numeric_input("$c m0 setpoint: "))
+        m1setpoint.put(get_numeric_input("$d m1 setpoint: "))
 
         per = get_numeric_input("$e task period")
 
