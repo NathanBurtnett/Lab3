@@ -77,7 +77,7 @@ def read_csv(end_tok):
         csv.append(r)
     return csv
 
-def run_step_response(s, kPs, setpoints, period):
+def run_step_response(s, kPs, setpoints, period, t_tot=5):
     """!
     Runs the step response of the motor.
     :param s: The serial value of the connecting wire
@@ -100,7 +100,7 @@ def run_step_response(s, kPs, setpoints, period):
     write_to_tok(s, "$e", period)
 
     # TODO: Fix this?
-    time.sleep(5)
+    time.sleep(t_tot)
 
     # Exit response loop
     write_ctrl_c(s)
@@ -114,20 +114,46 @@ def run_step_response(s, kPs, setpoints, period):
 
     return m0_csv, m1_csv
 
-def run_period_tests(periods):
-    pass    
-
-# Sets the serial channel and baud rate of the connection
-with serial.Serial('COM3', baudrate=115200) as s:
-    init_board(s)
-    run_step_response(s, .0025, 16000)
-    plt.plot(*proc_lines(), label="Kp=0.0025")
-    plt.plot(*proc_lines(run_step_response(s, .005, 16000)), label="Kp=0.005")
-    plt.plot(*proc_lines(run_step_response(s, .02, 16000)), label="Kp=0.02")
+def plot_period_tests(s, periods):
+    for p in periods:
+        m0, m1 = run_step_response(s, (.05, 0), (16000, 0), p)
+        m0 = [int(m) for m in m0]
+        t = list(range(0, len(m0)*p, p))
+        plt.plot(t, m0, label=f"period={p}")
 
     plt.legend(loc='lower right')
     plt.xlabel("Time (ms)")
     plt.ylabel("Position (enc count)")
     plt.title("Step Response")
-    plt.savefig("plot.png")
+    plt.savefig("periods.png")
     plt.show()
+
+def plot_position_tests(s, m0_poss, m1_poss, per):
+    m0_tot = []
+    m1_tot = []
+    for p in zip(m0_poss, m1_poss):
+        m0, m1 = run_step_response(s, (.05, 0), (16000, 0), per)
+        m0, m1 = [int(m) for m in m0], [int(m) for m in m1]
+
+        m0_tot.append(m0)
+        m1_tot.append(m1)
+
+    t = list(range(0, len(m0_tot)*p, p))
+
+    plt.plot(t, m0_tot, label=f"Motor 0")
+    plt.plot(t, m1_tot, label=f"Motor 1")
+
+    plt.legend(loc='lower right')
+    plt.xlabel("Time (ms)")
+    plt.ylabel("Position (enc count)")
+    plt.title("Step Response")
+    plt.savefig("positions.png")
+    plt.show()
+
+# Sets the serial channel and baud rate of the connection
+with serial.Serial('COM3', baudrate=115200) as s:
+    init_board(s)
+
+    plot_period_tests(s, [10, 20, 50, 100])
+
+    #plot_position_tests([16000, -16000, 0], [-16000, 16000, 0], 10)
