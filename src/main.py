@@ -54,14 +54,15 @@ def task1_fun(shares):
     # Create the motor and motor encoder objects
     m0 = MotorDriver(pyb.Pin.board.PA10, pyb.Pin.board.PB4, pyb.Pin.board.PB5, 3)
     enc0 = EncoderReader(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
+    con = Control(kp.get(), setpoint.get(), initial_output=0)
 
     while True:
         con.set_setpoint(setpoint.get())
         con.set_Kp(kp.get())
 
-        measured_output = -enc1.read()
+        measured_output = -enc0.read()
         motor_actuation = con.run(setpoint.get(), measured_output)
-        m1.set_duty_cycle(motor_actuation)
+        m0.set_duty_cycle(motor_actuation)
 
         data.put(measured_output)
         yield 0
@@ -77,14 +78,14 @@ def task2_fun(shares):
 
     # Create the motor and motor encoder objects
     m1 = MotorDriver(pyb.Pin.board.PC1, pyb.Pin.board.PA0, pyb.Pin.board.PA1, 5)
-    enc1 = EncoderReader(pyb.Pin.board.PC2, pyb.Pin.board.PC3, 4)
+    enc1 = EncoderReader(pyb.Pin.board.PC6, pyb.Pin.board.PC7, 8)
     con = Control(kp.get(), setpoint.get(), initial_output=0)
 
     while True:
         con.set_setpoint(setpoint.get())
         con.set_Kp(kp.get())
 
-        measured_output = -enc1.read()
+        measured_output = enc1.read()
         motor_actuation = con.run(setpoint.get(), measured_output)
         m1.set_duty_cycle(motor_actuation)
 
@@ -116,7 +117,7 @@ if __name__ == "__main__":
     m0Task = cotask.Task(task1_fun, name="Motor 0 Driver", priority=1, period=10,
                         profile=True, trace=False, shares=(m0Kp, m0setpoint, m0Data))
 
-    m1Task = cotask.Task(task1_fun, name="Motor 1 Driver", priority=1, period=10,
+    m1Task = cotask.Task(task2_fun, name="Motor 1 Driver", priority=1, period=10,
                         profile=True, trace=False, shares=(m1Kp, m1setpoint, m1Data))
 
     cotask.task_list.append(m0Task)
@@ -147,10 +148,13 @@ if __name__ == "__main__":
 
         # Print data
         print("$f M0 data")
-
+        for _ in range(m0Data.num_in()):
+            print(m0Data.get())
         print("$g End Data")
 
         print("$h M1 data")
+        for _ in range(m1Data.num_in()):
+            print(m1Data.get())
         print("$i End Data")
 
     # Print a table of task data and a table of shared information data

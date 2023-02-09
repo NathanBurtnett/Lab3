@@ -39,8 +39,6 @@ class Control:
         """
         error = setpoint - measured_output
         motor_actuation = self.Kp * error
-        self.times.append(utime.ticks_ms() - self.t_start)
-        self.positions.append(measured_output)
         return motor_actuation
 
     def set_setpoint(self, setpoint):

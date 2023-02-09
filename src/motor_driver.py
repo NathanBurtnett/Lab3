@@ -21,7 +21,6 @@ class MotorDriver:
         @param in1pin GPIO pin number for the first motor output pin
         @param timer GPIO pin for the time that is used in running the motor
         """
-        print("Creating a motor driver")
         # initialize GPIO
         self.enable_motor = pyb.Pin(en_pin, pyb.Pin.OUT_PP)
         self.pin_1 = pyb.Pin(in1pin, pyb.Pin.OUT_PP)
