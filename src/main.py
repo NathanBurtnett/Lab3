@@ -14,6 +14,11 @@ import gc
 import pyb
 import cotask
 import task_share
+import encoder_reader
+import control
+import motor_driver
+import boot
+
 
 
 def task1_fun(shares):
