@@ -21,7 +21,19 @@ import boot
 from motor_driver import MotorDriver
 
 
-def get_numeric_input(prompt):
+def get_inumeric_input(prompt):
+    while True:
+        try:
+            i = input(prompt)
+            return int(i)
+
+        except ValueError:
+            print("Invalid number")
+
+        except EOFError:
+            sys.exit(0)
+
+def get_fnumeric_input(prompt):
     while True:
         try:
             i = input(prompt)
@@ -32,8 +44,6 @@ def get_numeric_input(prompt):
 
         except EOFError:
             sys.exit(0)
-
-
 def task1_fun(shares):
     """!
     :param shares:
@@ -127,13 +137,14 @@ if __name__ == "__main__":
 
     # Run the scheduler with the chosen scheduling algorithm. Quit if ^C pressed
     while True:
-        m0Kp.put(get_numeric_input("$a m0 kp: "))
-        m1Kp.put(get_numeric_input("$b m1 kp: "))
+        m0Kp.put(get_fnumeric_input("$a m0 kp"))
+        m1Kp.put(get_fnumeric_input("$b m1 kp"))
 
-        m0setpoint.put(get_numeric_input("$c m0 setpoint: "))
-        m1setpoint.put(get_numeric_input("$d m1 setpoint: "))
+        m0setpoint.put(get_inumeric_input("$c m0 setpoint"))
+        m1setpoint.put(get_inumeric_input("$d m1 setpoint"))
 
-        per = get_numeric_input("$e task period")
+
+        per = get_inumeric_input("$e task period")
 
         m0Task.set_period(per)
         m1Task.set_period(per)
