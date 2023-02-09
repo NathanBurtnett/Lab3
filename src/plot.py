@@ -48,7 +48,7 @@ def init_board(ser):
     write_ctrl_d(s)
 
 
-def proc_lines(csv_lines):
+def process_response(period, ):
     """!
     Takes the lines from the passed csv file and readies it for plotting
     :param csv_lines: The passed through file to be plotted.
@@ -61,6 +61,7 @@ def proc_lines(csv_lines):
 
 def write(ser, val):
     ser.write(bytes(f"{val}\r\n", 'ascii'))
+
 
 def write_to_tok(s, tok, v):
     wait_for_tok(s, tok)
@@ -75,6 +76,7 @@ def read_csv(end_tok):
             break
         csv.append(r)
     return csv
+
 def run_step_response(s, kPs, setpoints, period):
     """!
     Runs the step response of the motor.
@@ -112,12 +114,13 @@ def run_step_response(s, kPs, setpoints, period):
 
     return m0_csv, m1_csv
 
+def run_period_tests(periods):
 
 # Sets the serial channel and baud rate of the connection
 with serial.Serial('COM3', baudrate=115200) as s:
     init_board(s)
-
-    plt.plot(*proc_lines(run_step_response(s, .0025, 16000)), label="Kp=0.0025")
+    run_step_response(s, .0025, 16000)
+    plt.plot(*proc_lines(), label="Kp=0.0025")
     plt.plot(*proc_lines(run_step_response(s, .005, 16000)), label="Kp=0.005")
     plt.plot(*proc_lines(run_step_response(s, .02, 16000)), label="Kp=0.02")
 
