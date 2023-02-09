@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>W23lab3</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <style type="text/css">
+html {
+font-size: 100%;
+-webkit-text-size-adjust: 100%;
+-ms-text-size-adjust: 100%;
+}
+body {
+color: #222;
+font-family: "Helvetica", "Arial", sans-serif;
+font-size: 12px;
+line-height: 1.7;
+padding: 1em;
+margin: auto;
+max-width: 48em;
+background: #fefefe;
+}
+
+#write {
+max-width: 860px;
+margin: 0 auto;
+padding: 20px 30px 40px 30px;
+padding-top: 20px;
+padding-bottom: 100px;
+}
+a {
+color: #0645ad;
+text-decoration: none;
+}
+a:visited {
+color: #0b0080;
+}
+a:hover {
+color: #06e;
+}
+a:active {
+color: #faa700;
+}
+a:focus {
+outline: thin dotted;
+}
+*::-moz-selection {
+background: rgba(200, 200, 0, 0.3);
+color: #000;
+}
+*::selection {
+background: rgba(200, 200, 0, 0.3);
+color: #000;
+}
+a::-moz-selection {
+background: rgba(200, 200, 0, 0.3);
+color: #0645ad;
+}
+a::selection {
+background: rgba(200, 200, 0, 0.3);
+color: #0645ad;
+}
+p {
+margin: 1em 0;
+
+}
+img {
+max-width: 100%;
+}
+
+h1, h2, h3, h4, h5, h6 {
+color: #000040;
+background: #F0F0F0;
+line-height: 125%;
+margin-top: 2em;
+margin-bottom: 0.5em;
+}
+h2, h3 {
+font-weight: bold;
+padding: 0.2em;
+margin-bottom: 0;
+}
+h4, h5, h6 {
+font-weight: bold;
+}
+h1, .subtitle {
+font-weight: bold;
+background: #fff;
+color: #0c343d;
+text-align: center;
+}
+h1 {
+background: #F0F0F0;
+font-weight: bold;
+font-size: 2em;
+margin-bottom: 2em;
+}
+.subtitle {
+line-height: 100%;
+margin-bottom: -3.30em;
+font-weight: normal;
+}
+h2 {
+background: #F0F0F0;
+font-size: 1.5em;
+}
+.heading {
+margin-bottom: 0;
+}
+.description, .Description {
+width: 100%;
+background: #f3f3f3;
+margin-top: 0;
+padding-top: 0.05em;
+padding-bottom: 0.05em;
+margin-bottom: 32px;
+}
+h3 {
+background: #F0F0F0;
+font-size: 1.5em;
+}
+h4 {
+font-size: 1.2em;
+}
+h5 {
+font-size: 1em;
+}
+h6 {
+font-size: 0.9em;
+}
+blockquote {
+color: #666666;
+margin: 0;
+padding-left: 3em;
+border-left: 0.5em #EEE solid;
+}
+hr {
+display: block;
+height: 2px;
+border: 0;
+border-top: 1px solid #aaa;
+border-bottom: 1px solid #eee;
+margin: 1em 0;
+padding: 0;
+}
+pre, code, kbd, samp {
+color: #000;
+background: #f8f8f8;
+font-family: monospace, monospace;
+_font-family: 'courier new', monospace;
+font-size: 0.98em;
+}
+pre {
+white-space: pre;
+white-space: pre-wrap;
+word-wrap: break-word;
+}
+b, strong {
+font-weight: bold;
+}
+dfn {
+font-style: italic;
+}
+ins {
+background: #ff9;
+color: #000;
+text-decoration: none;
+}
+mark {
+background: #ff0;
+color: #000;
+font-style: italic;
+font-weight: bold;
+}
+sub, sup {
+font-size: 75%;
+line-height: 0;
+position: relative;
+vertical-align: baseline;
+}
+sup {
+top: -0.5em;
+}
+sub {
+bottom: -0.25em;
+}
+ul, ol {
+margin: 1em 0;
+padding: 0 0 0 2em;
+}
+li p:last-child {
+margin-bottom: 0;
+}
+ul ul, ol ol {
+margin: .3em 0;
+}
+dl {
+margin-bottom: 1em;
+}
+dt {
+font-weight: bold;
+margin-bottom: .8em;
+}
+dd {
+margin: 0 0 .8em 2em;
+}
+dd:last-child {
+margin-bottom: 0;
+}
+img {
+border: 0;
+-ms-interpolation-mode: bicubic;
+vertical-align: middle;
+}
+figure {
+display: block;
+text-align: center;
+margin: 1em 0;
+}
+figure img {
+border: none;
+margin: 0 auto;
+}
+figcaption {
+font-size: 0.8em;
+font-style: italic;
+margin: 0 0 .8em;
+}
+table {
+width: 100%;
+margin-bottom: 2em;
+border-bottom: 1px solid #ddd;
+border-right: 1px solid #ddd;
+border-spacing: 0;
+border-collapse: collapse;
+}
+table th {
+padding: .2em 1em;
+background-color: #eee;
+border-top: 1px solid #ddd;
+border-left: 1px solid #ddd;
+}
+table td {
+padding: .2em 1em;
+border-top: 1px solid #ddd;
+border-left: 1px solid #ddd;
+vertical-align: top;
+}
+.author {
+font-size: 1.2em;
+text-align: center;
+}
+@media only screen and (min-width: 480px) {
+body {
+font-size: 14px;
+}
+}
+@media only screen and (min-width: 768px) {
+body {
+font-size: 16px;
+}
+}
+@media print {
+* {
+background: transparent !important;
+color: black !important;
+filter: none !important;
+-ms-filter: none !important;
+}
+body {
+font-size: 12pt;
+max-width: 100%;
+}
+a, a:visited {
+text-decoration: underline;
+}
+hr {
+height: 1px;
+border: 0;
+border-bottom: 1px solid black;
+}
+a[href]:after {
+content: " (" attr(href) ")";
+}
+abbr[title]:after {
+content: " (" attr(title) ")";
+}
+.ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after {
+content: "";
+}
+pre, blockquote {
+border: 1px solid #999;
+padding-right: 1em;
+page-break-inside: avoid;
+}
+tr, img {
+page-break-inside: avoid;
+}
+img {
+max-width: 100% !important;
+}
+@page :left {
+margin: 15mm 20mm 15mm 10mm;
+}
+@page :right {
+margin: 15mm 10mm 15mm 20mm;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3 {
+page-break-after: avoid;
+}
+}
+</style>
+</head>
+<body>
+<h1 id="lab-3-on-schedule">Lab #3: On Schedule</h1>
+<p>In this one-week exercise, you will put the code that you have developed in previous exercises into a real-time scheduler and test its performance. The scheduler allows your program to perform multitasking; you’ll need multitasking to be able to control the positions of multiple motors for your term project. You’ve written code which can drive a motor, measure its position, run a generic controller, and display the results. Now it’s time to drive two motors simultaneously.</p>
+<h2 id="the-project">The Project</h2>
+<ul>
+<li><p>Create a <strong>new</strong> GitHub™ repository for this exercise and synchronize it to a <code>Lab3</code> folder with <code>/src</code> and <code>/docs</code> subdirectories.</p></li>
+<li><p>Download the files <code>cotask.py</code>, <code>taskshare.py</code>, and <code>basic_tasks.py</code> (the latter from <code>/examples</code>) from the ME405 support repository at <a href="https://github.com/spluttflob/ME405-Support" class="uri">https://github.com/spluttflob/ME405-Support</a>. It’s easiest to download a <code>.zip</code> file using the Big Green Button, open the file in an archive manager, and extract those files into your <code>src</code> directory, though using Git to clone a copy of the repository is the <em>cool</em> way. Copy <code>cotask.py</code> and <code>taskshare.py</code> onto your MicroPython board.</p></li>
+<li><p>Run <code>basic_tasks.py</code> and verify that it works. It should run, printing a counter being sent from one task to another, until you press <strong>Ctrl-C</strong> in the serial port terminal; then it should print tables of task and share information.</p></li>
+<li><p>Rename <code>basic_tasks.py</code> as <code>main.py</code>. Use the example of a task function in <code>main.py</code> and what you’ve learned in lecture to write a task which runs the closed-loop motor controller you have previously written. Hook up a motor from your tub and run this task using the <code>cotask.py</code> scheduler with its task timing at around 10 ms.</p>
+<p><em><strong>Note:</strong> It is intended that your controller class’s</em> <code>run()</code> <em>method should do the control calculation once each time it is called; the task function will thus control how often the controller runs.</em></p></li>
+<li><p>Run the motor task on a motor with a flywheel, printing results and plotting step response graphs as you did in the previous exercise. Run the task at a slower and slower rate until the controller’s performance is noticeably worsened as shown on a step response plot. Record the slowest rate at which the performance is not significantly worse than when running the controller at a fast rate; this will help you choose a good run rate for the motor control task – it should be a bit faster than the slowest rate which works for a factor of safety. Save copies of the step response plots for the slowest rate at which the response is good and for a rate at which the response isn’t as good. <strong><em>Optional:</em></strong> <em>Plot several responses on one set of axes, with a legend showing the task run rate of each.</em></p></li>
+<li><p>Make two tasks which run two motors under closed-loop control at the same time. Write a test program which moves your motors simultaneously through different distances and holds them at the desired positions, and use it to test your code as thoroughly as possible. <!--   Test the tasks thoroughly, especially to ensure that 
+   the motors act independently of one another.--></p></li>
+</ul>
+<h2 id="deliverables">Deliverables</h2>
+<ul>
+<li><p>Before the due date, copy your source and documentation links to Canvas and push the following to GitHub™:</p>
+<ul>
+<li><p>A <code>README.md</code> file for this experiment which briefly explains what you did in this experiment and shows how well your two-motor control system works. There should be discussion of what happened when one motor control task was run too slowly and recommending a speed at which the task should be run for proper operation; these discussions should be supported by at least two step response plots.</p></li>
+<li><p>Your Python source code. Both the MicroPython files which run on the Nucleo and the CPython file you run on the PC should be in the <code>/src</code> subdirectory.</p></li>
+<li><p>The Doxygen documentation should be shown on the GitHub™ pages as usual.</p></li>
+</ul></li>
+<li><p>On the due date, you may be asked to demonstrate your program in lab.</p></li>
+</ul>
+</body>
+</html>
