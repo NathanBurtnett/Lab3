@@ -83,8 +83,6 @@ def task1_fun(shares):
         m0.set_duty_cycle(0)
         yield 0
 
-
-
 def task2_fun(shares):
     """!
     :param shares:
