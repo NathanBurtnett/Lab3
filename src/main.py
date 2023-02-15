@@ -1,26 +1,23 @@
 """!
-@file basic_tasks.py
+@file main.py
     This file contains a demonstration program that runs some tasks, an
     inter-task shared variable, and a queue. The tasks don't really @b do
     anything; the example just shows how these elements are created and run.
 
 @author JR Ridgely
-@date   2021-Dec-15 JRR Created from the remains of previous example
+@date   2023-Feb-15 JRR Created from the remains of previous example
 @copyright (c) 2015-2021 by JR Ridgely and released under the GNU
     Public License, Version 2. 
 """
 
-import gc
+
 import pyb
 import sys
-
 import utime
-
 import cotask
 import task_share
 from encoder_reader import EncoderReader
 from control import Control
-import boot
 from motor_driver import MotorDriver
 
 
