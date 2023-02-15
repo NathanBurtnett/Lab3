@@ -58,22 +58,29 @@ def task1_fun(shares):
     :param shares:
     :return:
     """
-    kp, setpoint, data = shares
+    kp, setpoint, data, reset = shares
 
     # Create the motor and motor encoder objects
     m0 = MotorDriver(pyb.Pin.board.PA10, pyb.Pin.board.PB4, pyb.Pin.board.PB5, 3)
     enc0 = EncoderReader(pyb.Pin.board.PB6, pyb.Pin.board.PB7, 4)
-    con = Control(kp.get(), setpoint.get(), initial_output=0)
 
     while True:
-        con.set_setpoint(setpoint.get())
-        con.set_Kp(kp.get())
+        con = Control(kp.get(), setpoint.get(), initial_output=0)
 
-        measured_output = -enc0.read()
-        motor_actuation = con.run(setpoint.get(), measured_output)
-        m0.set_duty_cycle(motor_actuation)
+        while reset.get() == 0:
+            con.set_setpoint(setpoint.get())
+            con.set_Kp(kp.get())
 
-        data.put(measured_output)
+            measured_output = -enc0.read()
+            motor_actuation = con.run(setpoint.get(), measured_output)
+            m0.set_duty_cycle(motor_actuation)
+
+            data.put(measured_output)
+            yield 0
+
+        # Reset
+        enc0.zero()
+        m0.set_duty_cycle(0)
         yield 0
 
 
@@ -83,22 +90,29 @@ def task2_fun(shares):
     :param shares:
     :return:
     """
-    kp, setpoint, data = shares
+    kp, setpoint, data, reset = shares
 
     # Create the motor and motor encoder objects
-    m1 = MotorDriver(pyb.Pin.board.PC1, pyb.Pin.board.PA0, pyb.Pin.board.PA1, 5)
     enc1 = EncoderReader(pyb.Pin.board.PC6, pyb.Pin.board.PC7, 8)
-    con = Control(kp.get(), setpoint.get(), initial_output=0)
+    m1 = MotorDriver(pyb.Pin.board.PC1, pyb.Pin.board.PA0, pyb.Pin.board.PA1, 5)
 
     while True:
-        con.set_setpoint(setpoint.get())
-        con.set_Kp(kp.get())
+        con = Control(kp.get(), setpoint.get(), initial_output=0)
 
-        measured_output = -enc1.read()
-        motor_actuation = con.run(setpoint.get(), measured_output)
-        m1.set_duty_cycle(motor_actuation)
+        while reset.get() == 0:
+            con.set_setpoint(setpoint.get())
+            con.set_Kp(kp.get())
 
-        data.put(measured_output)
+            measured_output = -enc1.read()
+            motor_actuation = con.run(setpoint.get(), measured_output)
+            m1.set_duty_cycle(motor_actuation)
+
+            data.put(measured_output)
+            yield 0
+
+        # Reset
+        enc1.zero()
+        m1.set_duty_cycle(0)
         yield 0
 
 # This code creates a share, a queue, and two tasks, then starts the tasks. The
@@ -111,6 +125,8 @@ if __name__ == "__main__":
     # Create a share and a queue to test function and diagnostic printouts
     m0Kp = task_share.Share('f', thread_protect=False, name="m0 kp")
     m1Kp = task_share.Share('f', thread_protect=False, name="m1 kp")
+
+    reset = task_share.Share('b', thread_protect=False, name="reset")
 
     m0setpoint = task_share.Share('l', thread_protect=False,
                                   name="m0 setpoint")
@@ -132,12 +148,12 @@ if __name__ == "__main__":
     m0Task = cotask.Task(task1_fun, name="Motor 0 Driver", priority=1,
                          period=10,
                          profile=True, trace=False,
-                         shares=(m0Kp, m0setpoint, m0Data))
+                         shares=(m0Kp, m0setpoint, m0Data, reset))
 
     m1Task = cotask.Task(task2_fun, name="Motor 1 Driver", priority=1,
                          period=10,
                          profile=True, trace=False,
-                         shares=(m1Kp, m1setpoint, m1Data))
+                         shares=(m1Kp, m1setpoint, m1Data, reset))
 
     task_list.append(m0Task)
     task_list.append(m1Task)
@@ -181,6 +197,13 @@ if __name__ == "__main__":
         for _ in range(m1Data.num_in()):
             print(m1Data.get())
         print("$i End Data")
+
+        reset.put(1)
+        s = utime.ticks_ms()
+        while utime.ticks_ms() - s < 1000:
+            task_list.pri_sched()
+
+        reset.put(0)
 
     # Print a table of task data and a table of shared information data
     print('\n' + str(cotask.task_list))

@@ -45,19 +45,9 @@ def init_board(ser):
     s.reset_input_buffer()
 
     # Reset board
+    # Reset boardd
     write_ctrl_d(s)
     print("INIT FINISHED")
-
-def process_response(period, ):
-    """!
-    Takes the lines from the passed csv file and readies it for plotting
-    :param csv_lines: The passed through file to be plotted.
-    :return: The x and y values to be plotted
-    """
-    x = [float(l.split(",")[0].strip()) for l in csv_lines]
-    y = [float(l.split(",")[1].strip()) for l in csv_lines]
-
-    return x, y
 
 def write(ser, val):
     ser.write(bytes(f"{val}\r\n", 'ascii'))
@@ -119,13 +109,12 @@ def plot_period_tests(s, periods):
     sp = 16000
     for p in periods:
         m0, m1 = run_step_response(s, (.05, 0), (sp, 0), p)
-        m0 = [int(m) - sp+16000 if -4294967 < int(m) < 4294967 else 0 for m in m0]
+        m0 = [int(m) if -4294967 < int(m) < 4294967 else 0 for m in m0]
         print(m0)
 
         t = list(range(0, len(m0)*p, p))
 
         plt.plot(t, m0, label=f"period={p}")
-        sp += 16000
         #time.sleep(1)
 
     plt.legend(loc='lower right')
@@ -135,32 +124,18 @@ def plot_period_tests(s, periods):
     plt.savefig("periods.png")
     plt.show()
 
-def plot_position_tests(s, m0_poss, m1_poss, per):
+def position_tests(s, m0_poss, m1_poss, per):
     m0_tot = []
     m1_tot = []
     for p in zip(m0_poss, m1_poss):
-        m0, m1 = run_step_response(s, (.05, 0), (16000, 0), per)
+        m0, m1 = run_step_response(s, (.05, .05), p, per)
         m0, m1 = [int(m) for m in m0], [int(m) for m in m1]
 
         m0_tot.append(m0)
         m1_tot.append(m1)
 
-    t = list(range(0, len(m0_tot)*p, p))
-
-    plt.plot(t, m0_tot, label=f"Motor 0")
-    plt.plot(t, m1_tot, label=f"Motor 1")
-
-    plt.legend(loc='lower right')
-    plt.xlabel("Time (ms)")
-    plt.ylabel("Position (enc count)")
-    plt.title("Step Response")
-    plt.savefig("positions.png")
-    plt.show()
-
 # Sets the serial channel and baud rate of the connection
-with serial.Serial('COM3', baudrate=115200) as s:
+with serial.Serial('COM5', baudrate=115200) as s:
     init_board(s)
 
-    plot_period_tests(s, [10, 20, 30, 50, 100])
-
-    #plot_position_tests([16000, -16000, 0], [-16000, 16000, 0], 10)
+    plot_period_tests(s, [10, 25, 40, 60, 100])
