@@ -25,6 +25,12 @@ from motor_driver import MotorDriver
 
 
 def get_inumeric_input(prompt):
+    """!
+    Takes the input "prompt" and tries to return as an integer value.
+    If the try fails, an error will be printed.
+    :param prompt: The input to be changed into an integer value.
+    :return: An integer value.
+    """
     while True:
         try:
             print(prompt)
@@ -39,7 +45,14 @@ def get_inumeric_input(prompt):
         except EOFError:
             sys.exit(0)
 
+
 def get_fnumeric_input(prompt):
+    """!
+    Takes the input "prompt" and tries to return as a float value.
+    If the try fails, an error will be printed.
+    :param prompt: The input to be changed into a float value.
+    :return: A float value.
+    """
     while True:
         try:
             print(prompt)
@@ -53,11 +66,10 @@ def get_fnumeric_input(prompt):
             sys.exit(0)
         except EOFError:
             sys.exit(0)
+
+
+# Share function created by JR Ridgely
 def task1_fun(shares):
-    """!
-    :param shares:
-    :return:
-    """
     kp, setpoint, data, reset = shares
 
     # Create the motor and motor encoder objects
@@ -84,12 +96,8 @@ def task1_fun(shares):
         yield 0
 
 
-
+# Share function created by JR Ridgely
 def task2_fun(shares):
-    """!
-    :param shares:
-    :return:
-    """
     kp, setpoint, data, reset = shares
 
     # Create the motor and motor encoder objects
@@ -114,6 +122,7 @@ def task2_fun(shares):
         enc1.zero()
         m1.set_duty_cycle(0)
         yield 0
+
 
 # This code creates a share, a queue, and two tasks, then starts the tasks. The
 # tasks run until somebody presses ENTER, at which time the scheduler stops and
@@ -185,7 +194,6 @@ if __name__ == "__main__":
         s = utime.ticks_ms()
         while utime.ticks_ms() - s < 1000:
             task_list.pri_sched()
-
 
         # Print data
         print("$f M0 data")
