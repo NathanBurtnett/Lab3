@@ -13,6 +13,9 @@
 import gc
 import pyb
 import sys
+
+import utime
+
 import cotask
 import task_share
 from encoder_reader import EncoderReader
@@ -24,24 +27,30 @@ from motor_driver import MotorDriver
 def get_inumeric_input(prompt):
     while True:
         try:
-            i = input(prompt)
+            print(prompt)
+            i = input()
             return int(i)
 
         except ValueError:
             print("Invalid number")
 
+        except KeyboardInterrupt:
+            sys.exit(0)
         except EOFError:
             sys.exit(0)
 
 def get_fnumeric_input(prompt):
     while True:
         try:
-            i = input(prompt)
+            print(prompt)
+            i = input()
             return float(i)
 
         except ValueError:
             print("Invalid number")
 
+        except KeyboardInterrupt:
+            sys.exit(0)
         except EOFError:
             sys.exit(0)
 def task1_fun(shares):
@@ -103,48 +112,64 @@ if __name__ == "__main__":
     m0Kp = task_share.Share('f', thread_protect=False, name="m0 kp")
     m1Kp = task_share.Share('f', thread_protect=False, name="m1 kp")
 
-    m0setpoint = task_share.Share('l', thread_protect=False, name="m0 setpoint")
-    m1setpoint = task_share.Share('l', thread_protect=False, name="m1 setpoint")
+    m0setpoint = task_share.Share('l', thread_protect=False,
+                                  name="m0 setpoint")
+    m1setpoint = task_share.Share('l', thread_protect=False,
+                                  name="m1 setpoint")
 
-    m0Data = task_share.Queue('L', 1000, thread_protect=False, overwrite=True,
-                          name="M0 data")
-    m1Data = task_share.Queue('L', 1000, thread_protect=False, overwrite=True,
-                          name="M1 data")
+    m0Data = task_share.Queue('L', 1000, thread_protect=False,
+                              overwrite=True,
+                              name="M0 data")
+    m1Data = task_share.Queue('L', 1000, thread_protect=False,
+                              overwrite=True,
+                              name="M1 data")
     # Create the tasks. If trace is enabled for any task, memory will be
     # allocated for state transition tracing, and the application will run out
     # of memory after a while and quit. Therefore, use tracing only for 
     # debugging and set trace to False when it's not needed
-    m0Task = cotask.Task(task1_fun, name="Motor 0 Driver", priority=1, period=10,
-                        profile=True, trace=False, shares=(m0Kp, m0setpoint, m0Data))
 
-    m1Task = cotask.Task(task2_fun, name="Motor 1 Driver", priority=1, period=10,
-                        profile=True, trace=False, shares=(m1Kp, m1setpoint, m1Data))
+    task_list = cotask.TaskList()
+    m0Task = cotask.Task(task1_fun, name="Motor 0 Driver", priority=1,
+                         period=10,
+                         profile=True, trace=False,
+                         shares=(m0Kp, m0setpoint, m0Data))
 
-    cotask.task_list.append(m0Task)
-    cotask.task_list.append(m1Task)
+    m1Task = cotask.Task(task2_fun, name="Motor 1 Driver", priority=1,
+                         period=10,
+                         profile=True, trace=False,
+                         shares=(m1Kp, m1setpoint, m1Data))
+
+    task_list.append(m0Task)
+    task_list.append(m1Task)
 
     # Run the memory garbage collector to ensure memory is as defragmented as
     # possible before the real-time scheduler is started
-    gc.collect()
 
     # Run the scheduler with the chosen scheduling algorithm. Quit if ^C pressed
+    print("Starting tasks!")
     while True:
+        print("?????")
         m0Kp.put(get_fnumeric_input("$a Set Motor 0 kp: "))
         m1Kp.put(get_fnumeric_input("$b Set Motor 1 kp: "))
+        print("?????")
 
         m0setpoint.put(get_inumeric_input("$c Set Motor 0 setpoint: "))
         m1setpoint.put(get_inumeric_input("$d Set Motor 1 setpoint: "))
-
 
         per = get_inumeric_input("$e Enter Task Period: ")
 
         m0Task.set_period(per)
         m1Task.set_period(per)
-        while True:
-            try:
-                cotask.task_list.pri_sched()
-            except KeyboardInterrupt:
-                break
+
+        m0Data.clear()
+        m1Data.clear()
+        m0Task.reset_profile()
+        m1Task.reset_profile()
+
+        s = utime.ticks_ms()
+        while utime.ticks_ms() - s < 1000:
+            task_list.pri_sched()
+
 
         # Print data
         print("$f M0 data")

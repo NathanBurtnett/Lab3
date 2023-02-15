@@ -36,17 +36,17 @@ def init_board(ser):
     print("initializing board...")
 
     # Make sure program is dead...
-    write_ctrl_d(s)
+    s.write(b'\x03\x03\x03\x03\x03\x03')
 
-    for _ in range(3):
-        write_ctrl_c(s)
+    ser.read_all()
 
-    time.sleep(.5)
+    time.sleep(2)
 
     s.reset_input_buffer()
 
     # Reset board
     write_ctrl_d(s)
+    print("INIT FINISHED")
 
 def process_response(period, ):
     """!
@@ -77,7 +77,7 @@ def read_csv(end_tok):
         csv.append(r)
     return csv
 
-def run_step_response(s, kPs, setpoints, period, t_tot=5):
+def run_step_response(s, kPs, setpoints, period, t_tot=1):
     """!
     Runs the step response of the motor.
     :param s: The serial value of the connecting wire
@@ -104,8 +104,8 @@ def run_step_response(s, kPs, setpoints, period, t_tot=5):
     time.sleep(t_tot)
 
     # Exit response loop
-    write_ctrl_c(s)
-    print("Getting CSV")
+    #write_ctrl_c(s)
+    #print("Getting CSV")
 
     wait_for_tok(s, "$f")
     m0_csv = read_csv("$g")
@@ -116,11 +116,17 @@ def run_step_response(s, kPs, setpoints, period, t_tot=5):
     return m0_csv, m1_csv
 
 def plot_period_tests(s, periods):
+    sp = 16000
     for p in periods:
-        m0, m1 = run_step_response(s, (.05, 0), (16000, 0), p)
-        m0 = [int(m) for m in m0]
+        m0, m1 = run_step_response(s, (.05, 0), (sp, 0), p)
+        m0 = [int(m) - sp+16000 if -4294967 < int(m) < 4294967 else 0 for m in m0]
+        print(m0)
+
         t = list(range(0, len(m0)*p, p))
+
         plt.plot(t, m0, label=f"period={p}")
+        sp += 16000
+        #time.sleep(1)
 
     plt.legend(loc='lower right')
     plt.xlabel("Time (ms)")
@@ -152,9 +158,9 @@ def plot_position_tests(s, m0_poss, m1_poss, per):
     plt.show()
 
 # Sets the serial channel and baud rate of the connection
-with serial.Serial('COM5', baudrate=115200) as s:
+with serial.Serial('COM3', baudrate=115200) as s:
     init_board(s)
 
-    plot_period_tests(s, [10, 20, 50, 100])
+    plot_period_tests(s, [10, 20, 30, 50, 100])
 
     #plot_position_tests([16000, -16000, 0], [-16000, 16000, 0], 10)
